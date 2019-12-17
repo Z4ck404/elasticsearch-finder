@@ -56,7 +56,7 @@ def getHosts(filename):
         for p in range(1, 2):
             results = api.search(query, page=p)
             for result in results['matches']:
-                //print (result)
+                #print (result)
                 host = str(result['ip_str'])
                 print(colored("[+] INFO: Found " + host ,'green'))
                 write(host, filename)
