@@ -8,6 +8,7 @@ from termcolor import colored
 
 __license__ = "GPLv3"
 __version__ = "1.0.0"
+SHODAN_API_KEY ="Shodan_API_Key_here"
 
 def banner():
     print('''
@@ -46,7 +47,6 @@ def write(entry, filename):
 def getHosts(filename):
     secret = configparser.RawConfigParser()
     secret.read('.env')
-    SHODAN_API_KEY = secret["shodan"]["key"]
     api = shodan.Shodan(SHODAN_API_KEY)
     if parse_args().country is not None:
         query = 'port:9200 json country:'+ '"'+ str(parse_args().country)+'"'
