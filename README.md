@@ -17,7 +17,10 @@ Steps to install:
 ## How it works?
 The script gets the data from Shodan. It will output a file in comma-seperated format in which you will find *open* elasticsearch instances.
 
-## Credits : 
+## Elastic search security 
+There is an open source plugin available with a free/community edition caller [Search Guard](https://github.com/floragunncom/search-guard) 
+
+## Credits 
 - Inspired from [Kibanarec](https://github.com/Lekssays/kibanarec) by [Ahmed Lessays](https://github.com/Lekssays)
 - This readme format and repo templete is also inspired from [Kibanarec](https://github.com/Lekssays/kibanarec).
 
