@@ -7,7 +7,7 @@ Requirements:
 - Shodan API Key
 
 Steps to install:
-- Replace SHODANAPIKEY in .env file with your SHODAN API KEY.
+- Replace SHODANAPIKEY in the code with your SHODAN API KEY.
 - Run `pip3 install -r requirements.txt` to install dependencies.
 - Run `python3 esf.py -o file.txt -c US -k products` where : 
     -`file.txt`is the output file. (optional)
