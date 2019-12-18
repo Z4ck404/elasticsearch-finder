@@ -7,12 +7,16 @@ Requirements:
 - Shodan API Key
 
 Steps to install:
-- Replace SHODANAPIKEY in the code with your SHODAN API KEY.
+- Replace SHODANAPIKEY in the code with your SHODAN API KEY (line 11)
+```
+SHODAN_API_KEY ="Shodan_API_Key_here"
+```
 - Run `pip3 install -r requirements.txt` to install dependencies.
 - Run `python3 esf.py -o file.txt -c US -k products` where : 
-    -`file.txt`is the output file. (optional)
-    -`US`is the code of the country you want to scan.(optional)
-    -`producs`is a key word in the results, an indice name for example.(optional)
+
+    - `file.txt`is the output file. (optional)
+    - `US`is the code of the country you want to scan.(optional)
+    - `producs`is a key word in the results, an indice name for example.(optional)
 
 ## How it works?
 The script gets the data from Shodan. It will output a file in comma-seperated format in which you will find *open* elasticsearch instances.
