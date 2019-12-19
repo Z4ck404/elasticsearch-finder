@@ -22,7 +22,7 @@ def banner():
     print(colored("Author: @Z4ck404"))
     print(colored("Version {} \n\n").format(__version__))
 
-def parse_args():
+ddef parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o','--output',
                         dest = "output",
@@ -39,27 +39,39 @@ def parse_args():
                         required = False)
     return parser.parse_args()
 
-def write(entry, filename):
+def write(entries, filename):
     out = open(filename, "a")
-    out.write(entry + "\n")
+    out.writelines(entries)
     out.close()
 
 def getHosts(filename):
-    secret = configparser.RawConfigParser()
-    secret.read('.env')
     api = shodan.Shodan(SHODAN_API_KEY)
     if parse_args().country is not None:
         query = 'port:9200 json country:'+ '"'+ str(parse_args().country)+'"'
     else:
         query = 'port:9200 json'
     try:
-        for p in range(1, 2):
+        for p in range(1, 150):
             results = api.search(query, page=p)
             for result in results['matches']:
-                #print (result)
                 host = str(result['ip_str'])
                 print(colored("[+] INFO: Found " + host ,'green'))
-                write(host, filename)
+                try:
+                    cluster_name = result['elastic']['cluster']['cluster_name']
+                    status = result['elastic']['cluster']['status']
+                    data = result['data']
+                    number_nodes = result['elastic']['cluster']['_nodes']['total']
+                    if data.find('kibana') != -1 :
+                        print(colored("[++] kibana is found", "magenta"))
+                    else:
+                        print(colored("[--] kibana is  not found", "magenta"))
+                    print("cluster name : ", cluster_name)
+                    print("status : ", colored(status,status))
+                    print("number of nodes : ", number_nodes)
+                    print (data[data.find('Elastic Indices'):])
+                    write([host + "\n",cluster_name+ "\n",status+ "\n",data[data.find('Elastic Indices'):]," ----- \n"], filename)
+                except KeyError as e:
+                    write([host + " ----- \n"], filename)
             time.sleep(1)
     except shodan.APIError as e:
         print('Error: {}'.format(e))
