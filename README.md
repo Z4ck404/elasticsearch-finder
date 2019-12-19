@@ -19,7 +19,10 @@ SHODAN_API_KEY ="Shodan_API_Key_here"
     - `producs`is a key word in the results, an indice name for example.(optional)
 
 ## How it works?
-The script gets the data from Shodan. It will output a file in comma-seperated format in which you will find *open* elasticsearch instances.
+The script gets the data from Shodan. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes, indices and wether kibana is installed or not.
+<p align = 'center'>
+  <img src = 'readme.jpg'>
+</p>
 
 ## Elastic search security 
 There is an open source plugin available with a free/community edition called [Search Guard](https://github.com/floragunncom/search-guard) 
