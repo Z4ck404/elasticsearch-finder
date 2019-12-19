@@ -2,7 +2,6 @@ import shodan
 import time
 import requests
 import argparse
-import configparser
 
 from termcolor import colored
 
