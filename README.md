@@ -14,7 +14,7 @@ SHODAN_API_KEY ="SHODAN_API_HERE"
 BINARYEDGE_API_KEY = "BINARYEDGE_API_KEY_HERE"
 ```
 - Run `pip3 install -r requirements.txt` to install dependencies.
-- Run `python3 esf.py -o file.txt -c US -k products` where : 
+- Run `python3 esf.py -o file.txt -c US` where : 
 
     - `file.txt`is the output file. (optional)
     - `US`is the code of the country you want to scan.(optional)
