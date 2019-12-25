@@ -30,6 +30,10 @@ def banner():
     print(colored("Author: @Z4ck404"))
     print(colored("Version {} \n\n").format(__version__))
 
+def reverse_dns(ip):
+    api = shodan.Shodan(SHODAN_API_KEY)
+    info = api.host(ip)['org']
+    return info
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o','--output',
@@ -58,8 +62,10 @@ def parse_args():
                         required = False)
     parser.add_argument('-s','--shodan',
                         action='store_true',
+                        dest="shodan",
                         help = "pull data from shodan")
     parser.add_argument('-b','--be',
+                        dest="binaryedge",
                         action='store_true',
                         help = "pull data from binary edge")
     return parser.parse_args()
@@ -95,22 +101,36 @@ def getHosts_binaryedge(first,last):
     for page in range(first, last) :
         elastic_results = binaryedge_query("type:%22elasticsearch%22" + " ",page)
         for service in elastic_results:
+                #print (service)
                 #print('http://' + service['target']['ip'] + ":" + str(service['target']['port']) + "/_cat/indices")
-                print(colored("[+] INFO: Found " + service['target']['ip'] ,'green'))
-                print("Port number :",str(service['target']['port']))
+                host = service['target']['ip']
+                port_number = str(service['target']['port'])
+                country = service['origin']['country']
+                cluster_name = service['result']['data']['cluster_name']
+                organization = reverse_dns(host)
+                number_nodes = service['result']['data']['cluster_nodes']
+                print(colored("[+] INFO: Found " + host ,'green'))
+                print("Port number :",port_number)
                 print("Source : BinaryEdge ")
-                print("Cluster name: "+ Fore.LIGHTMAGENTA_EX + service['result']['data']['cluster_name'] + Fore.RESET)
+                print ("country : ", country)
+                print("Cluster name: ",cluster_name)
+                print ("organization :", organization)
+                print("number of nodes : ",number_nodes)
                 print("Elastic Indices :")
+                sizee = 0
                 try:
                     for indice in service['result']['data']['indices']:
-                        if indice['size_in_bytes'] > 10000000000:
-                            print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
-                            print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
-                            print("Size: " + Fore.LIGHTCYAN_EX + str(size(indice['size_in_bytes'])) + Fore.RESET)
+                        #indices that have more than 1Gb od data ! 
+                        #if indice['size_in_bytes'] > 1000000000:
+                        print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
+                        print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
+                        print("Size: " + Fore.LIGHTCYAN_EX + str(size(indice['size_in_bytes'])) + Fore.RESET)
+                        sizee = sizee + indice['size_in_bytes']
+                    print ("cluster size : ",size(sizee))
                 except:
                     print("No indices")
                 print("-----------------------------")
-
+        break
 def getHosts_shodan(filename):
     api = shodan.Shodan(SHODAN_API_KEY)
     if parse_args().country is not None:
@@ -118,29 +138,36 @@ def getHosts_shodan(filename):
     else:
         query = 'port:9200 json'
     try:
-        for p in range(1, 3):
+        for p in range(1, 20):
             results = api.search(query, page=p)
             for result in results['matches']:
+                #print(result)
+                #check the size of the cluster and return only those with more than 10GB of data
                 host = str(result['ip_str'])
                 print(colored("[+] INFO: Found " + host ,'green'))
                 try:
+                    size = result['elastic']['indices']['store']['size_in_bytes']
                     cluster_name = result['elastic']['cluster']['cluster_name']
+                    port_number = 9200
+                    source = "shodan"
                     status = result['elastic']['cluster']['status']
                     data = result['data']
-                    number_nodes = result['elastic']['cluster']['_nodes']['total']
-                    if data.find('kibana') != -1 :
-                        print(colored("[++] kibana is found", "magenta"))
-                    else:
-                        print(colored("[--] kibana is  not found", "magenta"))
-                    print("Port number : 9200 ")
-                    print("Source : Shodan ")
+                    country = result['location']['country_code']
+                    number_nodes = result['elastic']['cluster']['nodes']['count']['total']
+                    organization = result['org']
+                    print("Port number :",port_number)
+                    print("Source :",source)
+                    print ("country : ",country)
                     print("cluster name : ", cluster_name)
+                    print ("organization : ", organization)
                     print("status : ", colored(status,status))
+                    print ("cluster size : ",size)
                     print("number of nodes : ", number_nodes)
                     print (data[data.find('Elastic Indices'):])
-                    write([host + "\n",cluster_name+ "\n",status+ "\n",data[data.find('Elastic Indices'):]," ----- \n"], filename)
+                    print("-----------------------------")
+                    write([host + "\n",cluster_name+ "\n",status+ "\n",data[data.find('Elastic Indices'):]," ----------------------------- \n"], filename)
                 except KeyError as e:
-                    write([host + " ----- \n"], filename)
+                        write([host + "\n" + " ----------------------------- \n"], filename)
             time.sleep(1)
     except shodan.APIError as e:
         print('Error: {}'.format(e))
@@ -151,8 +178,16 @@ def main():
     filename = output_name(parse_args().output)
     first = parse_args().first
     last = parse_args().last
-    #getHosts_shodan(filename)
-    getHosts_binaryedge(first,last)
-
+    shodan = parse_args().shodan
+    be = parse_args().binaryedge
+    
+    if ((not shodan) and (not be)) :
+        print("Please specify a data source by adding -s and/or -b")
+        sys.exit()
+    if shodan :
+        getHosts_shodan(filename)
+    if be:
+        getHosts_binaryedge(first,last)
+   
 if __name__ == '__main__':
     main()
