@@ -97,7 +97,7 @@ def binaryedge_query(query,page):
 
     return req_json['events']
 
-def getHosts_binaryedge(first,last):
+def getHosts_binaryedge(first,last,filename):
     for page in range(first, last) :
         if parse_args().country is not None:
             query = "type:%22elasticsearch%22" +" " + "country:"+'"'+ str(parse_args().country)+'"'
@@ -111,7 +111,8 @@ def getHosts_binaryedge(first,last):
                 port_number = str(service['target']['port'])
                 country = service['origin']['country']
                 cluster_name = service['result']['data']['cluster_name']
-                organization = reverse_dns(host)
+                #organization = reverse_dns(host)
+                organization = "test"
                 number_nodes = service['result']['data']['cluster_nodes']
                 print(colored("[+] INFO: Found " + host ,'green'))
                 print("Port number :",port_number)
@@ -122,18 +123,28 @@ def getHosts_binaryedge(first,last):
                 print("number of nodes : ",number_nodes)
                 print("Elastic Indices :")
                 sizee = 0
+                indices = []
                 try:
                     for indice in service['result']['data']['indices']:
                         #indices that have more than 1Gb od data ! 
                         #if indice['size_in_bytes'] > 1000000000:
                         print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
+                        indices.append(indice['index_name'])
                         print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
                         print("Size: " + Fore.LIGHTCYAN_EX + str(size(indice['size_in_bytes'])) + Fore.RESET)
                         sizee = sizee + indice['size_in_bytes']
                     print ("cluster size : ",size(sizee))
                 except:
                     print("No indices")
-                print("-----------------------------")
+                write( ["host:" + host + "\n", 
+                "source : binary edge" + "\n", 
+                "cluster name :" + cluster_name+ "\n",
+                "organization :"+ organization +"\n",
+                " number of nodes : "+ str(number_nodes)+ "\n",
+                "size of the cluster :"  + str(size(sizee)) + "\n",
+                "indices" + str(indices)," \n ----------------------------- \n"], filename)
+                print(" \n ----------------------------- \n")
+
         break
 def getHosts_shodan(filename):
     api = shodan.Shodan(SHODAN_API_KEY)
@@ -142,11 +153,10 @@ def getHosts_shodan(filename):
     else:
         query = 'port:9200 json'
     try:
-        for p in range(1, 2):
+        for p in range(1, 150):
             results = api.search(query, page=p)
             for result in results['matches']:
                 #print(result)
-                #check the size of the cluster and return only those with more than 10GB of data
                 host = str(result['ip_str'])
                 print(colored("[+] INFO: Found " + host ,'green'))
                 try:
@@ -169,7 +179,13 @@ def getHosts_shodan(filename):
                     print("number of nodes : ", number_nodes)
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
-                    write([host + "\n",cluster_name+ "\n",status+ "\n",data[data.find('Elastic Indices'):]," ----------------------------- \n"], filename)
+                     write( ["host:" + host + "\n", 
+                    "source : binary edge" + "\n", 
+                    "cluster name :" + cluster_name+ "\n",
+                    "organization :"+ organization +"\n",
+                    " number of nodes : "+ str(number_nodes)+ "\n",
+                    "size of the cluster :"  + str(size(sizee)) + "\n",
+                    "indices" + data[data.find('Elastic Indices'):]," \n ----------------------------- \n"], filename)
                 except KeyError as e:
                     print (e)
                     pass
@@ -190,10 +206,10 @@ def main():
     if ((not shodan) and (not be)) :
         print("Please specify a data source by adding -s and/or -b")
         sys.exit()
-    if shodan :
-        getHosts_shodan(filename)
+    #if shodan :
+        #getHosts_shodan(filename)
     if be:
-        getHosts_binaryedge(first,last)
+        getHosts_binaryedge(first,last,filename)
    
 if __name__ == '__main__':
     main()
