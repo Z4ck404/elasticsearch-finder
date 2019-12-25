@@ -99,7 +99,11 @@ def binaryedge_query(query,page):
 
 def getHosts_binaryedge(first,last):
     for page in range(first, last) :
-        elastic_results = binaryedge_query("type:%22elasticsearch%22" + " ",page)
+        if parse_args().country is not None:
+            query = "type:%22elasticsearch%22" +" " + "country:"+'"'+ str(parse_args().country)+'"'
+        else:
+            query = "type:%22elasticsearch%22" +" "
+        elastic_results = binaryedge_query(query,page)
         for service in elastic_results:
                 #print (service)
                 #print('http://' + service['target']['ip'] + ":" + str(service['target']['port']) + "/_cat/indices")
