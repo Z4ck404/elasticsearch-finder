@@ -31,8 +31,10 @@ The script gets the data from Shodan and/or binaryedge. It will output a file in
 ## Credits 
 - Inspired from [Kibanarec](https://github.com/Lekssays/kibanarec) by [Ahmed Lessays](https://github.com/Lekssays) and from [LeakLocker](https://github.com/woj-ciech/LeakLooker) by [woj-ciech](https://github.com/woj-ciech)
 
-## Credits 
-- Do more recon on the hosts.
-- Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
+## TO DO 
+[] Do more recon on the hosts.
+[] Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
+[] Add more export options (csv, excel,etc).
+[] Making the world more secure :) 
 
 
