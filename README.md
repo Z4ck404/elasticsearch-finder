@@ -26,9 +26,13 @@ The script gets the data from Shodan and/or binaryedge. It will output a file in
 </p>
 
 ## Elastic search security 
-There is an open source plugin available with a free/community edition called [Search Guard](https://github.com/floragunncom/search-guard) 
+- There is an open source plugin available with a free/community edition called [Search Guard](https://github.com/floragunncom/search-guard) 
 
 ## Credits 
 - Inspired from [Kibanarec](https://github.com/Lekssays/kibanarec) by [Ahmed Lessays](https://github.com/Lekssays) and from [LeakLocker](https://github.com/woj-ciech/LeakLooker) by [woj-ciech](https://github.com/woj-ciech)
+
+## Credits 
+- Do more recon on the hosts.
+- Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
 
 
