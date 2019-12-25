@@ -138,7 +138,7 @@ def getHosts_shodan(filename):
     else:
         query = 'port:9200 json'
     try:
-        for p in range(1, 20):
+        for p in range(1, 2):
             results = api.search(query, page=p)
             for result in results['matches']:
                 #print(result)
@@ -146,7 +146,6 @@ def getHosts_shodan(filename):
                 host = str(result['ip_str'])
                 print(colored("[+] INFO: Found " + host ,'green'))
                 try:
-                    size = result['elastic']['indices']['store']['size_in_bytes']
                     cluster_name = result['elastic']['cluster']['cluster_name']
                     port_number = 9200
                     source = "shodan"
@@ -155,20 +154,23 @@ def getHosts_shodan(filename):
                     country = result['location']['country_code']
                     number_nodes = result['elastic']['cluster']['nodes']['count']['total']
                     organization = result['org']
+                    sizee = size(result['elastic']['cluster']['indices']['store']['size_in_bytes'])
                     print("Port number :",port_number)
                     print("Source :",source)
                     print ("country : ",country)
                     print("cluster name : ", cluster_name)
                     print ("organization : ", organization)
                     print("status : ", colored(status,status))
-                    print ("cluster size : ",size)
+                    print ("cluster size : ",sizee)
                     print("number of nodes : ", number_nodes)
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
                     write([host + "\n",cluster_name+ "\n",status+ "\n",data[data.find('Elastic Indices'):]," ----------------------------- \n"], filename)
                 except KeyError as e:
-                        write([host + "\n" + " ----------------------------- \n"], filename)
+                    print (e)
+                    pass
             time.sleep(1)
+            break
     except shodan.APIError as e:
         print('Error: {}'.format(e))
         pass
