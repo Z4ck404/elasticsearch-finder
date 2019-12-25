@@ -179,7 +179,7 @@ def getHosts_shodan(filename):
                     print("number of nodes : ", number_nodes)
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
-                     write( ["host:" + host + "\n", 
+                    write( ["host:" + host + "\n", 
                     "source : binary edge" + "\n", 
                     "cluster name :" + cluster_name+ "\n",
                     "organization :"+ organization +"\n",
