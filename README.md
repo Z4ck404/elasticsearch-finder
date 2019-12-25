@@ -14,12 +14,14 @@ SHODAN_API_KEY ="SHODAN_API_HERE"
 BINARYEDGE_API_KEY = "BINARYEDGE_API_KEY_HERE"
 ```
 - Run `pip3 install -r requirements.txt` to install dependencies.
-- Run `python3 esf.py -o file.txt -c US -s -b` where : 
+- Run `python3 esf.py -o file.txt -c US -s -b -f 1 -l 3` where : 
 
     - `file.txt`is the output file. (optional)
     - `US`is the code of the country you want to scan.(optional)
     - `s` use shodan to extract data
     - `b` use binaryedge to extract data  
+    - `f` first page to extract data from;
+    - `l` last page to extract data from
 
 ## How it works?
 The script gets the data from Shodan and/or binaryedge. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes,etc.
