@@ -206,8 +206,8 @@ def main():
     if ((not shodan) and (not be)) :
         print("Please specify a data source by adding -s and/or -b")
         sys.exit()
-    #if shodan :
-        #getHosts_shodan(filename)
+    if shodan :
+        getHosts_shodan(filename)
     if be:
         getHosts_binaryedge(first,last,filename)
    
