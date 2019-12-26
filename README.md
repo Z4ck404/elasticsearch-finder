@@ -24,7 +24,7 @@ BINARYEDGE_API_KEY = "BINARYEDGE_API_KEY_HERE"
     - `l` last page to extract data from
 
 ## How it works?
-The script gets the data from Shodan and/or binaryedge. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes,etc.
+The script gets the data from Shodan and/or binaryedge. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes,organization based on ssl certificate if available,etc.
 <p align = 'center'>
   <img src = 'readme.jpg'>
 </p>
