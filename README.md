@@ -1,6 +1,15 @@
 # elasticsearch-finder
 A tool to find open instances of elastic search  for bug bounty
 
+```
+            ___________       ___________   ______  __________ 
+           / ____/ ___/      / ____/  _/ | / / __ \/ ____/ __ 
+          / __/  \__ \______/ /_   / //  |/ / / / / __/ / /_/ /
+         / /___ ___/ /_____/ __/ _/ // /|  / /_/ / /___/ _, _/ 
+        /_____//____/     /_/   /___/_/ |_/_____/_____/_/ |_|  
+
+```
+
 ## Installation
 Requirements:
 - Python3 
