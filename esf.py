@@ -41,6 +41,7 @@ def reverse_dns(ip):
         #print (element)
         if element['port'] == 443 :
             organization = element['ssl']['cert']['subject']['CN']
+            break
     return hoster,organization
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
