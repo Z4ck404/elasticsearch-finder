@@ -197,8 +197,7 @@ def main():
         print("Please specify a data source by adding -s and/or -b")
         sys.exit()
     if shodan :
-        #getHosts_shodan(filename)
-        print(reverse_dns("198.71.233.163")[0])
+        getHosts_shodan(filename)
     if be:
         getHosts_binaryedge(first,last,filename)
    
