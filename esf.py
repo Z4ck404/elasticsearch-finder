@@ -13,22 +13,24 @@ import requests
 from pybinaryedge import BinaryEdge
 from urllib.parse import urlparse
 from datetime import datetime
-__license__ = "GPLv3"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 SHODAN_API_KEY =""
 BINARYEDGE_API_KEY = ''
 be = BinaryEdge(BINARYEDGE_API_KEY)
 def banner():
     print('''
-          ______  _____ ______ 
-        |  ____|/ ____|  ____|
-        | |__  | (___ | |__   
-        |  __|  \___ \|  __|  
-        | |____ ____) | |     
-        |______|_____/|_|                                         
+
+            ___________       ___________   ______  __________ 
+           / ____/ ___/      / ____/  _/ | / / __ \/ ____/ __ 
+          / __/  \__ \______/ /_   / //  |/ / / / / __/ / /_/ /
+         / /___ ___/ /_____/ __/ _/ // /|  / /_/ / /___/ _, _/ 
+        /_____//____/     /_/   /___/_/ |_/_____/_____/_/ |_|  
+
+     **** Find elastic search instances available in the web ****                                                                               
         ''')
-    print(colored("Author: @Z4ck404"))
-    print(colored("Version {} \n\n").format(__version__))
+        
+    print(colored("Author: Zakaria EL BAZI (@Z4ck404)", "magenta"))
+    print(colored("Version {} \n\n", "magenta").format(__version__))
 
 def reverse_dns(ip):
     api = shodan.Shodan(SHODAN_API_KEY)
@@ -111,8 +113,8 @@ def getHosts_binaryedge(first,last,filename):
                 port_number = str(service['target']['port'])
                 country = service['origin']['country']
                 cluster_name = service['result']['data']['cluster_name']
-                #organization = reverse_dns(host)
-                organization = "test"
+                organization = reverse_dns(host)
+                #organization = "test"
                 number_nodes = service['result']['data']['cluster_nodes']
                 print(colored("[+] INFO: Found " + host ,'green'))
                 print("Port number :",port_number)
@@ -127,20 +129,21 @@ def getHosts_binaryedge(first,last,filename):
                 try:
                     for indice in service['result']['data']['indices']:
                         #indices that have more than 1Gb od data ! 
-                        #if indice['size_in_bytes'] > 1000000000:
-                        print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
-                        indices.append(indice['index_name'])
-                        print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
-                        print("Size: " + Fore.LIGHTCYAN_EX + str(size(indice['size_in_bytes'])) + Fore.RESET)
+                        if indice['size_in_bytes'] > 1000000000:
+                            print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
+                            indices.append(indice['index_name'])
+                            print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
+                            print("Size: " + Fore.LIGHTCYAN_EX + str(size(indice['size_in_bytes'])) + Fore.RESET)
                         sizee = sizee + indice['size_in_bytes']
                     print ("cluster size : ",size(sizee))
                 except:
                     print("No indices")
                 write( ["host:" + host + "\n", 
+                "Port number :" + port_number+ "\n",
                 "source : binary edge" + "\n", 
                 "cluster name :" + cluster_name+ "\n",
                 "organization :"+ organization +"\n",
-                " number of nodes : "+ str(number_nodes)+ "\n",
+                "number of nodes : "+ str(number_nodes)+ "\n",
                 "size of the cluster :"  + str(size(sizee)) + "\n",
                 "indices" + str(indices)," \n ----------------------------- \n"], filename)
                 print(" \n ----------------------------- \n")
@@ -180,7 +183,8 @@ def getHosts_shodan(filename):
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
                     write( ["host:" + host + "\n", 
-                    "source : binary edge" + "\n", 
+                    "Port number :" + port_number+ "\n",
+                    "source : Shodan" + "\n", 
                     "cluster name :" + cluster_name+ "\n",
                     "organization :"+ organization +"\n",
                     " number of nodes : "+ str(number_nodes)+ "\n",
