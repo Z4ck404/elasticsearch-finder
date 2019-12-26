@@ -34,8 +34,14 @@ def banner():
 
 def reverse_dns(ip):
     api = shodan.Shodan(SHODAN_API_KEY)
-    info = api.host(ip)['org']
-    return info
+    hoster = api.host(ip)['org']
+    organization = 'unkown'
+    result = api.host(ip)
+    for element in result['data'] :
+        #print (element)
+        if element['port'] == 443 :
+            organization = element['ssl']['cert']['subject']['CN']
+    return hoster,organization
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-o','--output',
@@ -113,7 +119,8 @@ def getHosts_binaryedge(first,last,filename):
                 port_number = str(service['target']['port'])
                 country = service['origin']['country']
                 cluster_name = service['result']['data']['cluster_name']
-                organization = reverse_dns(host)
+                hoster = reverse_dns(host)[0]
+                organization = reverse_dns(host)[1]
                 #organization = "test"
                 number_nodes = service['result']['data']['cluster_nodes']
                 print(colored("[+] INFO: Found " + host ,'green'))
@@ -121,6 +128,7 @@ def getHosts_binaryedge(first,last,filename):
                 print("Source : BinaryEdge ")
                 print ("country : ", country)
                 print("Cluster name: ",cluster_name)
+                print ("hosting provider :", hoster)
                 print ("organization :", organization)
                 print("number of nodes : ",number_nodes)
                 print("Elastic Indices :")
@@ -142,6 +150,7 @@ def getHosts_binaryedge(first,last,filename):
                 "Port number :" + port_number+ "\n",
                 "source : binary edge" + "\n", 
                 "cluster name :" + cluster_name+ "\n",
+                "hosting provider :"+ hoster +"\n",
                 "organization :"+ organization +"\n",
                 "number of nodes : "+ str(number_nodes)+ "\n",
                 "size of the cluster :"  + str(size(sizee)) + "\n",
@@ -170,7 +179,8 @@ def getHosts_shodan(filename):
                     data = result['data']
                     country = result['location']['country_code']
                     number_nodes = result['elastic']['cluster']['nodes']['count']['total']
-                    organization = result['org']
+                    #organization = result['org']
+                    organization = reverse_dns(host)[1]
                     sizee = size(result['elastic']['cluster']['indices']['store']['size_in_bytes'])
                     print("Port number :",port_number)
                     print("Source :",source)
@@ -211,7 +221,8 @@ def main():
         print("Please specify a data source by adding -s and/or -b")
         sys.exit()
     if shodan :
-        getHosts_shodan(filename)
+        #getHosts_shodan(filename)
+        print(reverse_dns("198.71.233.163")[0])
     if be:
         getHosts_binaryedge(first,last,filename)
    
