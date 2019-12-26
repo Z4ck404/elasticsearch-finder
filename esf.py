@@ -44,38 +44,13 @@ def reverse_dns(ip):
     return hoster,organization
 def parse_args():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-o','--output',
-                        dest = "output",
-                        help = "Name of the file where results will be stored. Default will be es(timedate).txt",
-                        required = False)
-    parser.add_argument('-c','--country',
-                        dest = "country",
-                        help = "The country you want to scan.",
-                        required = False)
-    parser.add_argument('-k','--keyword',
-                        dest = "keyword",
-                        help = "add a keyword to your search like a specific indice name",
-                        required = False)
-    parser.add_argument('-f','--first',
-                        dest = "first",
-                        help = "the first page to check for binary edge, default will be 1",
-                        default= 1,
-                        type= int,
-                        required = False)
-    parser.add_argument('-l','--last',
-                        dest = "last",
-                        help = "the last page to check for binary edge, default will be 3",
-                        default= 3,
-                        type= int,
-                        required = False)
-    parser.add_argument('-s','--shodan',
-                        action='store_true',
-                        dest="shodan",
-                        help = "pull data from shodan")
-    parser.add_argument('-b','--be',
-                        dest="binaryedge",
-                        action='store_true',
-                        help = "pull data from binary edge")
+    parser.add_argument('-o','--output',dest = "output",help = "Name of the file where results will be stored. Default will be es(timedate).txt",required = False)
+    parser.add_argument('-c','--country', dest = "country",help = "The country you want to scan.",required = False)
+    parser.add_argument('-k','--keyword',dest = "keyword",help = "add a keyword to your search like a specific indice name",required = False)
+    parser.add_argument('-f','--first', dest = "first",help = "the first page to check for binary edge, default will be 1",default= 1,type= int, required = False)
+    parser.add_argument('-l','--last',dest = "last",help = "the last page to check for binary edge, default will be 3",default= 3,type= int,required = False)
+    parser.add_argument('-s','--shodan',action='store_true',dest="shodan", help = "pull data from shodan")
+    parser.add_argument('-b','--be',dest="binaryedge",action='store_true',help = "pull data from binary edge")
     return parser.parse_args()
 
 def write(entries, filename):
