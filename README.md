@@ -47,7 +47,7 @@ The script gets the data from Shodan and/or binaryedge. It will output a file in
 ## TO DO 
 - [ ] Do more recon on the hosts.
 - [ ] Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
-- [ ] Add more export options (csv, excel,etc).
+- [x] Add more export options (csv, excel,etc).
 - [ ] Add more data ressources (Zoomeye).
 - [x] Making the world more secure :) 
 
