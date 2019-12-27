@@ -1,6 +1,15 @@
 # elasticsearch-finder
 A tool to find open instances of elastic search  for bug bounty
 
+```
+            ___________       ___________   ______  __________ 
+           / ____/ ___/      / ____/  _/ | / / __ \/ ____/ __ 
+          / __/  \__ \______/ /_   / //  |/ / / / / __/ / /_/ /
+         / /___ ___/ /_____/ __/ _/ // /|  / /_/ / /___/ _, _/ 
+        /_____//____/     /_/   /___/_/ |_/_____/_____/_/ |_|  
+
+```
+
 ## Installation
 Requirements:
 - Python3 
@@ -24,7 +33,7 @@ BINARYEDGE_API_KEY = "BINARYEDGE_API_KEY_HERE"
     - `l` last page to extract data from
 
 ## How it works?
-The script gets the data from Shodan and/or binaryedge. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes,etc.
+The script gets the data from Shodan and/or binaryedge. It will output a file in which you will find *open* elasticsearch instances and their meta data such as cluster name, status, number of nodes,organization based on ssl certificate if available,etc.
 <p align = 'center'>
   <img src = 'readme.jpg'>
 </p>
@@ -39,6 +48,7 @@ The script gets the data from Shodan and/or binaryedge. It will output a file in
 - [ ] Do more recon on the hosts.
 - [ ] Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
 - [ ] Add more export options (csv, excel,etc).
+- [ ] Add more data ressources (Zoomeye).
 - [x] Making the world more secure :) 
 
 
