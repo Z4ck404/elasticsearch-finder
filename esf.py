@@ -21,7 +21,7 @@ import ssl
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import xlsxwriter
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 SHODAN_API_KEY =""
 BINARYEDGE_API_KEY = ''
 be = BinaryEdge(BINARYEDGE_API_KEY)
