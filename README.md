@@ -42,7 +42,8 @@ The script gets the data from Shodan and/or binaryedge. It will output a file (t
 - There is an open source plugin available with a free/community edition called [Search Guard](https://github.com/floragunncom/search-guard) 
 
 ## Credits 
-- Inspired from [Kibanarec](https://github.com/Lekssays/kibanarec) by [Ahmed Lessays](https://github.com/Lekssays) and from [LeakLocker](https://github.com/woj-ciech/LeakLooker) by [woj-ciech](https://github.com/woj-ciech)
+- Inspired from [Kibanarec](https://github.com/Lekssays/kibanarec) by [Ahmed Lessays](https://github.com/Lekssays) and from [LeakLocker](https://github.com/woj-ciech/LeakLooker) by [woj-ciech](https://github.com/woj-ciech).
+- Some parts are taken from [Hostname](https://github.com/SpiderLabs/HostHunter) by [SpiderLabs](https://github.com/SpiderLabs)
 
 ## TO DO 
 - [ ] Do more recon on the hosts.

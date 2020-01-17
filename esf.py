@@ -13,6 +13,13 @@ import requests
 from pybinaryedge import BinaryEdge
 from urllib.parse import urlparse
 from datetime import datetime
+from time import time,sleep
+import OpenSSL
+import urllib3
+import requests
+import ssl
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import xlsxwriter
 __version__ = "1.0.1"
 SHODAN_API_KEY =""
@@ -34,16 +41,93 @@ def banner():
     print(colored("Version {} \n\n", "magenta").format(__version__))
 
 def reverse_dns(ip):
-    api = shodan.Shodan(SHODAN_API_KEY)
-    hoster = api.host(ip)['org']
-    organization = 'unkown'
-    result = api.host(ip)
-    for element in result['data'] :
-        #print (element)
-        if element['port'] == 443 :
-            organization = element['ssl']['cert']['subject']['CN']
-            break
-    return hoster,organization
+    try:
+        api = shodan.Shodan(SHODAN_API_KEY)
+        hoster = api.host(ip)['org']
+        result = api.host(ip)
+        for element in result['data'] :
+            #print (element)
+            if element['port'] == 443 :
+                organization = element['ssl']['cert']['subject']['CN']
+                break
+        return hoster,organization
+    except:
+        organization = 'unkown'
+        hoster = 'unkown'
+        return hoster,organization
+
+#the class host : 
+class target:
+    def __init__(self,address):
+        self.address = address
+        self.hname = []
+        self.apps = []
+        self.ipv6 = False
+
+def bingIT(hostx):
+    try:
+        http = urllib3.PoolManager()
+        r3 = http.request('GET','https://www.bing.com/search?q=ip%%3a%s' % hostx.address,decode_content=True)
+        response= r3.data.decode('utf-8')
+        bing_results = re.findall(pattern,response)
+        #print ("[Debug] Bing.com Response: ",bing_results)
+        for item in bing_results:
+            url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
+            item = re.sub("\"","",url)
+            hostx.apps.append(item)
+            host = re.sub("(http(s)?://)","",item)
+            host2 = re.sub("/(.)*","",host)
+            if (host2=="") or (host2 in hostx.hname):
+                pass
+            else:
+                hostx.hname.append(host2)
+    except:
+    #except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError,socket.error,socket.timeout) as e:
+        print ("[*] Error: connecting with Bing.com")
+    finally:
+        http.clear()
+
+# sslGrabber Function
+def sslGrabber(hostx,port):
+    try:
+        cert=ssl.get_server_certificate((hostx.address, port))
+        x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, cert)
+        cert_hostname=x509.get_subject().CN
+        # Add New HostNames to List
+        if cert_hostname is not None:
+            for host in cert_hostname.split('\n'):
+                if (host=="") or (host in hostx.hname):
+                    pass
+                else:
+                    hostx.hname.append(host)
+    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
+        pass
+
+# queryAPI Function
+def queryAPI(url,hostx):
+    try:
+        r2 = requests.get(url+hostx.address).text
+        if (r2.find("No DNS A records found")==-1) and (r2.find("API count exceeded")==-1 and r2.find("error")==-1):
+            for host in r2.split('\n'):
+                if (host=="") or (host in hostx.hname):
+                    pass
+                else:
+                    hostx.hname.append(host)
+        # Add API count exceed detection
+        else:
+            pass
+    except (requests.exceptions.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError) as e:
+        print ("[*] Error: connecting with HackerTarget.com API")
+    finally:
+        sleep(0.5)
+def host_name(host):
+    hostx = target(host)
+    #sslGrabber(hostx,443)
+        # Querying HackerTarget.com API
+    queryAPI("https://api.hackertarget.com/reverseiplookup/?q=",hostx)
+    bingIT(hostx)
+    return hostx.hname
+
 
 #export data to excel :
 def create_workbook(filename):
@@ -72,7 +156,7 @@ def parse_args():
     parser.add_argument('-c','--country', dest = "country",help = "The country you want to scan.",required = False)
     parser.add_argument('-k','--keyword',dest = "keyword",help = "add a keyword to your search like a specific indice name",required = False)
     parser.add_argument('-f','--first', dest = "first",help = "the first page to check for binary edge, default will be 1",default= 1,type= int, required = False)
-    parser.add_argument('-l','--last',dest = "last",help = "the last page to check for binary edge, default will be 3",default= 2,type= int,required = False)
+    parser.add_argument('-l','--last',dest = "last",help = "the last page to check for binary edge, default will be 3",default= 30,type= int,required = False)
     parser.add_argument('-s','--shodan',action='store_true',dest="shodan", help = "pull data from shodan")
     parser.add_argument('-b','--be',dest="binaryedge",action='store_true',help = "pull data from binary edge")
     return parser.parse_args()
@@ -106,7 +190,7 @@ def binaryedge_query(query,page):
 
 def getHosts_binaryedge(first,last,filename,workbook):
     worksheet = create_worksheet(workbook,'binaryedge')
-    for page in range(first, last) :
+    for page in range(1, 150) :
         if parse_args().country is not None:
             query = "type:%22elasticsearch%22" +" " + "country:"+'"'+ str(parse_args().country)+'"'
         else:
@@ -120,10 +204,10 @@ def getHosts_binaryedge(first,last,filename,workbook):
                 port_number = str(service['target']['port'])
                 country = service['origin']['country']
                 cluster_name = service['result']['data']['cluster_name']
-                hoster = reverse_dns(host)[0]
-                #hoster = "test"
-                organization = reverse_dns(host)[1]
-                #organization = "test"
+                #hoster = reverse_dns(host)[0]
+                hoster = ""
+                #organization = reverse_dns(host)[1]
+                organization = host_name(host)
                 number_nodes = service['result']['data']['cluster_nodes']
                 print(colored("[+] INFO: Found " + host ,'green'))
                 print("Port number :",port_number)
@@ -139,7 +223,7 @@ def getHosts_binaryedge(first,last,filename,workbook):
                 try:
                     for indice in service['result']['data']['indices']:
                         #indices that have more than 1Gb od data ! 
-                        if indice['size_in_bytes'] > 1000000000:
+                        if indice['size_in_bytes'] > 1:
                             print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
                             indices.append(indice['index_name'])
                             print("No. of documents: " +Fore.BLUE + str(indice['docs']) + Fore.RESET)
@@ -148,26 +232,28 @@ def getHosts_binaryedge(first,last,filename,workbook):
                     print ("cluster size : ",size(sizee))
                 except:
                     print("No indices")
-                worksheet.write(row, 0,host)
-                worksheet.write(row, 1,port_number)
-                worksheet.write(row, 2,"binary edge")
-                worksheet.write(row, 3,country)
-                worksheet.write(row, 4,cluster_name)
-                worksheet.write(row, 5,hoster)
-                worksheet.write(row, 6,organization)
-                worksheet.write(row, 7,number_nodes)
-                worksheet.write(row, 8,str(size(sizee)))
-                worksheet.write(row, 9,str(indices))
-                row = row + 1
-                write( ["host:" + host + "\n", 
-                "Port number :" + port_number+ "\n",
-                "source : binary edge" + "\n", 
-                "cluster name :" + cluster_name+ "\n",
-                "hosting provider :"+ hoster +"\n",
-                "organization :"+ organization +"\n",
-                "number of nodes : "+ str(number_nodes)+ "\n",
-                "size of the cluster :"  + str(size(sizee)) + "\n",
-                "indices" + str(indices)," \n ----------------------------- \n"], filename)
+                if sizee > 10 :  
+                    print (service)
+                    worksheet.write(row, 0,host)
+                    worksheet.write(row, 1,port_number)
+                    worksheet.write(row, 2,"binary edge")
+                    worksheet.write(row, 3,country)
+                    worksheet.write(row, 4,cluster_name)
+                    worksheet.write(row, 5,hoster)
+                    worksheet.write(row, 6,str(organization))
+                    worksheet.write(row, 7,number_nodes)
+                    worksheet.write(row, 8,str(size(sizee)))
+                    worksheet.write(row, 9,str(indices))
+                    row = row + 1
+                    write( ["host:" + host + "\n", 
+                    "Port number :" + port_number+ "\n",
+                    "source : binary edge" + "\n", 
+                    "cluster name :" + cluster_name+ "\n",
+                    "hosting provider :"+ hoster +"\n",
+                    "organization :"+ str(organization) +"\n",
+                    "number of nodes : "+ str(number_nodes)+ "\n",
+                    "size of the cluster :"  + str(size(sizee)) + "\n",
+                    "indices" + str(indices)," \n ----------------------------- \n"], filename)
                 print(" \n ----------------------------- \n")
 
         break
@@ -181,6 +267,7 @@ def getHosts_shodan(filename,workbook):
     try:
         for p in range(1, 150):
             results = api.search(query, page=p)
+            sleep(1)
             row = 1
             for result in results['matches']:
                 #print(result)
@@ -195,7 +282,8 @@ def getHosts_shodan(filename,workbook):
                     country = result['location']['country_code']
                     number_nodes = result['elastic']['cluster']['nodes']['count']['total']
                     #organization = result['org']
-                    organization = reverse_dns(host)[1]
+                    organization = host_name(host)
+                    sleep(1)
                     sizee = size(result['elastic']['cluster']['indices']['store']['size_in_bytes'])
                     print("Port number :",port_number)
                     print("Source :",source)
@@ -208,12 +296,12 @@ def getHosts_shodan(filename,workbook):
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
                     write( ["host:" + host + "\n", 
-                    "Port number :" + port_number+ "\n",
+                    "Port number :" + str(port_number)+ "\n",
                     "source : Shodan" + "\n", 
                     "cluster name :" + cluster_name+ "\n",
-                    "organization :"+ organization +"\n",
+                    "organization :"+ str(organization) +"\n",
                     " number of nodes : "+ str(number_nodes)+ "\n",
-                    "size of the cluster :"  + str(size(sizee)) + "\n",
+                    "size of the cluster :"  + str(sizee) + "\n",
                     "indices" + data[data.find('Elastic Indices'):]," \n ----------------------------- \n"], filename)
                     worksheet.write(row, 0,host)
                     worksheet.write(row, 1,port_number)
@@ -221,15 +309,15 @@ def getHosts_shodan(filename,workbook):
                     worksheet.write(row, 3,country)
                     worksheet.write(row, 4,cluster_name)
                     worksheet.write(row, 5,"")
-                    worksheet.write(row, 6,organization)
+                    worksheet.write(row, 6,str(organization))
                     worksheet.write(row, 7,number_nodes)
-                    worksheet.write(row, 8,str(size(sizee)))
+                    worksheet.write(row, 8,str(sizee))
                     worksheet.write(row, 9,str(data[data.find('Elastic Indices'):]))
                     row = row + 1
                 except KeyError as e:
                     print (e)
                     pass
-            time.sleep(1)
+            sleep(1)
             break
     except shodan.APIError as e:
         print('Error: {}'.format(e))

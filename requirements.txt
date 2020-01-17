@@ -8,3 +8,4 @@ hurry.filesize==0.9
 urllib3==1.25.2
 pybinaryedge
 termcolor
+pyOpenSSL>=18.0.0
