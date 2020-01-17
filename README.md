@@ -1,3 +1,5 @@
+[![GitHub release](https://img.shields.io/github/release/Z4ck404/elasticsearch-finder.svg?color=orange&style=popout)](https://github.com/Z4ck404/elasticsearch-finder/releases)
+
 # elasticsearch-finder
 A tool to find open instances of elastic search  for bug bounty
 
