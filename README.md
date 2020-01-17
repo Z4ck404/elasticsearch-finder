@@ -46,7 +46,7 @@ The script gets the data from Shodan and/or binaryedge. It will output a file (t
 - Some parts are taken from [Hostname](https://github.com/SpiderLabs/HostHunter) by [SpiderLabs](https://github.com/SpiderLabs)
 
 ## TO DO 
-- [ ] Do more recon on the hosts.
+- [x] Do more recon on the hosts.
 - [ ] Do analysis on the cluster and documents (sensitive or non sensitive data) and filter results based on that.
 - [x] Add more export options (csv, excel,etc).
 - [ ] Add more data ressources (Zoomeye).
