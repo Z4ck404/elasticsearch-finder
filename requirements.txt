@@ -5,7 +5,7 @@ configparser
 beautifulsoup4==4.7.1
 colorama==0.4.1
 hurry.filesize==0.9
-urllib3==1.25.2
+urllib3==2.6.0
 pybinaryedge
 termcolor
 pyOpenSSL>=18.0.0
