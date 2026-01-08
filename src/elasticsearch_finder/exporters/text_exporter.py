@@ -40,5 +40,5 @@ class TextExporter:
         if result.get("indices"):
             entries.append(f"indices: {result.get('indices')}\n")
 
-        entries.append(" \n ----------------------------- \n")
+        entries.append("\n-----------------------------\n")
         self.write(entries)

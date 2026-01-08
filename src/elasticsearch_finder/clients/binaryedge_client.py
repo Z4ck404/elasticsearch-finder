@@ -35,7 +35,7 @@ class BinaryEdgeClient:
         params = {"query": query, "page": page}
 
         try:
-            response = requests.get(self.BASE_URL, headers=self.headers, params=params, timeout=30)
+            response = requests.get(self.BASE_URL, headers=self.headers, params=params, timeout=15)
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:

@@ -31,7 +31,7 @@ class TestBinaryEdgeClient:
             "https://api.binaryedge.io/v2/query/search",
             headers={"X-Key": "test_api_key"},
             params={"query": 'type:"elasticsearch"', "page": 1},
-            timeout=30,
+            timeout=15,
         )
         assert result["total"] == 100
 
@@ -50,7 +50,7 @@ class TestBinaryEdgeClient:
             "https://api.binaryedge.io/v2/query/search",
             headers={"X-Key": "test_api_key"},
             params={"query": 'type:"elasticsearch" country:"US"', "page": 2},
-            timeout=30,
+            timeout=15,
         )
 
     @patch("elasticsearch_finder.clients.binaryedge_client.requests")
