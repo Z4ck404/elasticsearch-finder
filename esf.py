@@ -1,32 +1,29 @@
-import shodan
-import time
-import requests
 import argparse
-from termcolor import colored
-from hurry.filesize import size
-from colorama import Fore
 import json
-import sys
-import argparse
-from bs4 import BeautifulSoup
-import requests
-from pybinaryedge import BinaryEdge
-from urllib.parse import urlparse
-from datetime import datetime
-from time import time,sleep
-import OpenSSL
-import urllib3
-import requests
 import ssl
+import sys
+from datetime import datetime
+from time import sleep
+
+import OpenSSL
+import requests
+import shodan
+import urllib3
+from colorama import Fore
+from hurry.filesize import size
+from pybinaryedge import BinaryEdge
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from termcolor import colored
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 import xlsxwriter
+
 __version__ = "1.1.0"
 SHODAN_API_KEY =""
 BINARYEDGE_API_KEY = ''
 be = BinaryEdge(BINARYEDGE_API_KEY)
 def banner():
-    print('''
+    print(r'''
 
             ___________       ___________   ______  __________ 
            / ____/ ___/      / ____/  _/ | / / __ \/ ____/ __ 
@@ -36,7 +33,7 @@ def banner():
 
      **** Find elastic search instances available in the web ****                                                                               
         ''')
-        
+
     print(colored("Author: Zakaria EL BAZI (@Z4ck404)", "magenta"))
     print(colored("Version {} \n\n", "magenta").format(__version__))
 
@@ -56,7 +53,7 @@ def reverse_dns(ip):
         hoster = 'unkown'
         return hoster,organization
 
-#the class host : 
+#the class host :
 class target:
     def __init__(self,address):
         self.address = address
@@ -72,7 +69,7 @@ def bingIT(hostx):
         bing_results = re.findall(pattern,response)
         #print ("[Debug] Bing.com Response: ",bing_results)
         for item in bing_results:
-            url = re.findall("(http(s)?://[^\s]+)",item)[0][0]
+            url = re.findall(r"(http(s)?://[^\s]+)",item)[0][0]
             item = re.sub("\"","",url)
             hostx.apps.append(item)
             host = re.sub("(http(s)?://)","",item)
@@ -100,7 +97,7 @@ def sslGrabber(hostx,port):
                     pass
                 else:
                     hostx.hname.append(host)
-    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError) as e:
+    except (urllib3.exceptions.ReadTimeoutError,requests.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.TimeoutError):
         pass
 
 # queryAPI Function
@@ -116,7 +113,7 @@ def queryAPI(url,hostx):
         # Add API count exceed detection
         else:
             pass
-    except (requests.exceptions.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError) as e:
+    except (requests.exceptions.ConnectionError,urllib3.connection.ConnectionError,urllib3.exceptions.ConnectTimeoutError,urllib3.exceptions.MaxRetryError,urllib3.exceptions.TimeoutError):
         print ("[*] Error: connecting with HackerTarget.com API")
     finally:
         sleep(0.5)
@@ -170,10 +167,10 @@ def output_name(output):
     now = datetime.now()
     dt_string = now.strftime("%d%m%Y%H%M%S")
     filename = "es" + dt_string +".txt"
-    if parse_args().output is not None : 
+    if parse_args().output is not None :
         filename = output
     return filename
-    
+
 def binaryedge_query(query,page):
     headers = {'X-Key': BINARYEDGE_API_KEY}
     end = 'https://api.binaryedge.io/v2/query/search?query='+query+'&page='+str(page)
@@ -222,7 +219,7 @@ def getHosts_binaryedge(first,last,filename,workbook):
                 indices = []
                 try:
                     for indice in service['result']['data']['indices']:
-                        #indices that have more than 1Gb od data ! 
+                        #indices that have more than 1Gb od data !
                         if indice['size_in_bytes'] > 1:
                             print("Name: " + Fore.GREEN + indice['index_name'] + Fore.RESET)
                             indices.append(indice['index_name'])
@@ -232,7 +229,7 @@ def getHosts_binaryedge(first,last,filename,workbook):
                     print ("cluster size : ",size(sizee))
                 except:
                     print("No indices")
-                if sizee > 10 :  
+                if sizee > 10 :
                     print (service)
                     worksheet.write(row, 0,host)
                     worksheet.write(row, 1,port_number)
@@ -245,9 +242,9 @@ def getHosts_binaryedge(first,last,filename,workbook):
                     worksheet.write(row, 8,str(size(sizee)))
                     worksheet.write(row, 9,str(indices))
                     row = row + 1
-                    write( ["host:" + host + "\n", 
+                    write( ["host:" + host + "\n",
                     "Port number :" + port_number+ "\n",
-                    "source : binary edge" + "\n", 
+                    "source : binary edge" + "\n",
                     "cluster name :" + cluster_name+ "\n",
                     "hosting provider :"+ hoster +"\n",
                     "organization :"+ str(organization) +"\n",
@@ -295,9 +292,9 @@ def getHosts_shodan(filename,workbook):
                     print("number of nodes : ", number_nodes)
                     print (data[data.find('Elastic Indices'):])
                     print("-----------------------------")
-                    write( ["host:" + host + "\n", 
+                    write( ["host:" + host + "\n",
                     "Port number :" + str(port_number)+ "\n",
-                    "source : Shodan" + "\n", 
+                    "source : Shodan" + "\n",
                     "cluster name :" + cluster_name+ "\n",
                     "organization :"+ str(organization) +"\n",
                     " number of nodes : "+ str(number_nodes)+ "\n",

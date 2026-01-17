@@ -1,0 +1,18 @@
+# Docker Compose for Elasticsearch Finder
+# Convenient way to run with environment variables
+
+services:
+  esf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: elasticsearch-finder:latest
+    container_name: esf
+    environment:
+      - SHODAN_API_KEY=${SHODAN_API_KEY}
+      - BINARYEDGE_API_KEY=${BINARYEDGE_API_KEY}
+    volumes:
+      # Mount output directory to persist results
+      - ./output:/app/output
+    # Override command as needed
+    # command: ["-s", "-b", "--analyze", "-o", "results"]

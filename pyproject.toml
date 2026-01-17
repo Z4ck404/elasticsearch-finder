@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "elasticsearch-finder"
@@ -24,6 +24,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Security",
 ]
 requires-python = ">=3.9"
@@ -54,16 +55,28 @@ Homepage = "https://github.com/Z4ck404/elasticsearch-finder"
 Repository = "https://github.com/Z4ck404/elasticsearch-finder"
 Issues = "https://github.com/Z4ck404/elasticsearch-finder/issues"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.hatch.build.targets.wheel]
+packages = ["src/elasticsearch_finder"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "responses>=0.24.0",
+    "ruff>=0.3.0",
+]
 
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+exclude = ["esf.py"]  # Legacy file with many issues
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "B", "S"]
-ignore = ["S101"]  # Allow assert in tests
+ignore = ["S101", "E501"]  # Allow assert in tests, ignore line length for now
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S105", "S106"]  # Allow asserts and hardcoded passwords in tests
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
