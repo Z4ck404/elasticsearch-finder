@@ -85,7 +85,7 @@ jobs:
 
       - name: Upload Docker image artifact
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: docker-image-${{ github.sha }}
           path: elasticsearch-finder-docker.tar.gz
@@ -138,7 +138,7 @@ jobs:
           docker save ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${VERSION} | gzip > elasticsearch-finder-${VERSION}-docker.tar.gz
 
       - name: Upload release artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: docker-image-release-${{ github.ref_name }}
           path: elasticsearch-finder-*-docker.tar.gz
